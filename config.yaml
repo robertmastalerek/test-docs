@@ -8,7 +8,7 @@ blackfriday:
   plainIDAnchors: true
 
 params:
-  canonicalBasePath: "https://robertmastalerek.github.io"
+  canonicalBasePath: "https://robertmastalerek.github.io/test-docs"
   sections:
     - id: "get-started"
       name: "Get Started"
