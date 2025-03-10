@@ -27,7 +27,7 @@ export default {
   // …
   links: [
     {
-      label: 'Camunda Forum',
+      label: 'EximeeBPMS Forum',
       href: 'https://forum.camunda.org',
       description: 'Forum for Camnuda BPM users and developers'
     },
