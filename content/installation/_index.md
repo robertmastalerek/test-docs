@@ -1,6 +1,6 @@
 ---
 
-title: "Install Camunda 7"
+title: "Install EximeeBPMS"
 weight: 40
 
 menu:
