@@ -24,16 +24,27 @@ jobs:
 
       - name: Configure Git
         run: |
+          echo "Configuring Git..."
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+          git config --list
+
+      - name: Check GitHub Token
+        run: |
+          echo "Checking GitHub Token..."
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user
+
+      - name: Cleanup before build
+        run: rm -rf public
 
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          rm -rf public
           git clone https://x-access-token:${GITHUB_TOKEN}@github.com/robertmastalerek/test-docs.git --branch gh-pages --single-branch public
-          rsync -av --delete public/ ./public/
+          rsync -av --delete ./public/ ./public-deploy/
           cd public
           git add .
           git commit -m "Deploy Hugo site" || echo "No changes to commit"
