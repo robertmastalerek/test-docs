@@ -1,5 +1,5 @@
 ---
-baseURL: "https://robertmastalerek.github.io/test-docs"
+baseURL: "https://robertmastalerek.github.io/test-docs/"
 languageCode: "en-us"
 title: "Camunda 7 documentation"
 theme: "camunda"
