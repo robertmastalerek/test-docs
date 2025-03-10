@@ -22,7 +22,7 @@ jobs:
           hugo-version: '0.119.0'
 
       - name: Build site
-        run: hugo --minify
+        run: hugo --config config.yaml --minify
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
