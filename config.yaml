@@ -4,6 +4,8 @@ languageCode: "en-us"
 title: "Camunda 7 documentation"
 theme: "camunda"
 
+relativeURLs: false
+
 blackfriday:
   plainIDAnchors: true
 
