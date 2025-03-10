@@ -1,35 +1,36 @@
-name: Deploy Hugo site to GitHub Pages
+name: Deploy Hugo site
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: '0.68.3'
+          extended: true
 
       - name: Build site
-        run: hugo --config config.yaml --minify
+        run: hugo
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"- name: Deploy to GitHub Pages
           rm -rf public
           git clone https://x-access-token:${GITHUB_TOKEN}@github.com/robertmastalerek/test-docs.git --branch gh-pages --single-branch public
           rsync -av --delete public/ ./public/
