@@ -20,7 +20,7 @@ jobs:
           extended: true
  
       - name: Build site
-        run: hugo --baseURL https://robertmastalerek.github.io/test-docs/
+        run: hugo --baseURL https://robertmastalerek.github.io/test-docs/ --config config.yaml
 
       - name: Configure Git
         run: |
