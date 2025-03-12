@@ -54,11 +54,6 @@ jobs:
         run: |
           hugo --source ./security --destination ./public/security --baseURL "${{ github.server_url }}/${{ github.repository }}/security"
 
-      - name: Combine all sites into the public directory
-        run: |
-          mkdir -p ./public
-          cp -r ./public/* ./public/
-
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
