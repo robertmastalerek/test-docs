@@ -38,21 +38,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Build 'manual' site
+      - name: Build sites
         run: |
-          hugo --source ./manual --destination ./public/manual --baseURL "${{ github.server_url }}/${{ github.repository }}/manual"
-
-      - name: Build 'get-started' site
-        run: |
-          hugo --source ./get-started --destination ./public/get-started --baseURL "${{ github.server_url }}/${{ github.repository }}/get-started"
-
-      - name: Build 'enterprise' site
-        run: |
-          hugo --source ./enterprise --destination ./public/enterprise --baseURL "${{ github.server_url }}/${{ github.repository }}/enterprise"
-
-      - name: Build 'security' site
-        run: |
-          hugo --source ./security --destination ./public/security --baseURL "${{ github.server_url }}/${{ github.repository }}/security"
+          # Build each site individually, directing Hugo to use specific configurations for each site
+          hugo --source ./manual --destination ./public --config ./manual/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/manual"
+          hugo --source ./get-started --destination ./public --config ./get-started/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/get-started"
+          hugo --source ./enterprise --destination ./public --config ./enterprise/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/enterprise"
+          hugo --source ./security --destination ./public --config ./security/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/security"
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
