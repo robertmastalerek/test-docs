@@ -40,7 +40,7 @@ jobs:
 
       - name: Build manual site
         run: |
-          hugo --source ./manual --destination ./public/manual --config ./manual/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/manual"
+          hugo --source ./manual --destination ./public --config ./manual/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}"
       
       - name: Build get-started site
         run: |
