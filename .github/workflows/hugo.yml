@@ -1,71 +1,55 @@
-name: Deploy Multi-Site Hugo to GitHub Pages
+name: Build and Deploy Hugo Sites to GitHub Pages
 
 on:
   push:
-    branches: ["master"]
+    branches:
+      - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-defaults:
-  run:
-    shell: bash
-
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
-    env:
-      HUGO_VERSION: '0.54.0'
-
     steps:
-      - name: Install Hugo CLI
-        run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
-
-      - name: Install Dart Sass
-        run: sudo snap install dart-sass
-
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v2
         with:
-          submodules: recursive
+          hugo_version: '0.88.1'
+          extended: true
 
-      - name: Build manual site
+      - name: Build and Deploy get-started site
         run: |
-          hugo --source ./manual --destination ./public --config ./manual/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}"
-      
-      - name: Build get-started site
-        run: |
-          hugo --source ./get-started --destination ./public/get-started --config ./get-started/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/get-started"
-      
-      - name: Build enterprise site
-        run: |
-          hugo --source ./enterprise --destination ./public/enterprise --config ./enterprise/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/enterprise"
+          cd get-started
+          hugo -s . -d ../public/get-started
+        env:
+          HUGO_ENV: production
 
-      - name: Build security site
+      - name: Build and Deploy enterprise site
         run: |
-          hugo --source ./security --destination ./public/security --config ./security/config.yaml --baseURL "${{ github.server_url }}/${{ github.repository }}/security"
+          cd enterprise
+          hugo -s . -d ../public/enterprise
+        env:
+          HUGO_ENV: production
 
-      - name: Upload build artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
+      - name: Build and Deploy security site
+        run: |
+          cd security
+          hugo -s . -d ../public/security
+        env:
+          HUGO_ENV: production
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+      - name: Build and Deploy user-guide site
+        run: |
+          cd user-guide
+          hugo -s . -d ../public/user-guide
+        env:
+          HUGO_ENV: production
+
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          destination_dir: /
