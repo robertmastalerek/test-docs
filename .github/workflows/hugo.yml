@@ -32,10 +32,6 @@ jobs:
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Build enterprise site
-        run: |
-          cd enterprise
-          hugo server --baseURL=http://localhost
       - name: Deploy enterprise to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
