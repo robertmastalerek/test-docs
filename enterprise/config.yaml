@@ -14,16 +14,16 @@ params:
   sections:
     - id: "get-started"
       name: "Get Started"
-      url: "/get-started"
+      url: "/test-docs/get-started"
     - id: "user-guide"
       name: "Camunda 7"
       url: "/"
     - id: "enterprise"
       name: "Enterprise"
-      url: "/enterprise"
+      url: "/test-docs/enterprise"
     - id: "security"
       name: "Security"
-      url: "/security"
+      url: "/test-docs/security"
   section:
     id: "enterprise"
   github:
