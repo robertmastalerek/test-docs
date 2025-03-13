@@ -25,29 +25,13 @@ jobs:
       HUGO_VERSION: '0.54.0'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install Hugo CLI
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Build get-started site
-        run: |
-          cd get-started
-          hugo server --baseURL=http://localhost
-
-      - name: Deploy get-started to GitHub Pages
-        uses: actions/deploy-pages@v1
-        with:
-          path: get-started/public
-
-
-  deploy_enterprise:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
       - name: Build enterprise site
         run: |
           cd enterprise
@@ -57,11 +41,6 @@ jobs:
         with:
           path: enterprise/public
 
-  deploy_security:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
       - name: Build security site
         run: |
           cd security
@@ -71,11 +50,6 @@ jobs:
         with:
           path: security/public
 
-  deploy_user_guide:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
       - name: Build user-guide site
         run: |
           cd user-guide
