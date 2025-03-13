@@ -1,5 +1,5 @@
 ---
-baseURL: "/enterprise/"
+baseURL: "/test-docs/enterprise/"
 languageCode: "en-us"
 title: "Camunda Enterprise"
 theme: "camunda"
@@ -15,7 +15,7 @@ params:
     - id: "get-started"
       name: "Get Started"
       url: "/get-started"
-    - id: "manual"
+    - id: "user-guide"
       name: "Camunda 7"
       url: "/"
     - id: "enterprise"
