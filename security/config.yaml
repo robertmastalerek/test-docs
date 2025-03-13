@@ -4,6 +4,8 @@ languageCode: "en-us"
 title: "Product Security Guide"
 theme: "camunda"
 
+relativeURLs: true
+
 blackfriday:
   plainIDAnchors: true
 
