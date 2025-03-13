@@ -19,19 +19,29 @@ defaults:
     shell: bash
 
 jobs:
-  deploy_get_started:
+  build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: '0.54.0'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Hugo CLI
+        run: |
+          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
       - name: Build get-started site
         run: |
           cd get-started
           hugo server --baseURL=http://localhost
+
       - name: Deploy get-started to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
           path: get-started/public
+
 
   deploy_enterprise:
     runs-on: ubuntu-latest
