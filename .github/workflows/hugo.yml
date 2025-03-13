@@ -56,7 +56,7 @@ jobs:
       - name: Build and Deploy user-guide site
         run: |
           cd user-guide
-          hugo -s . -d ../public/user-guide
+          hugo -s . -d ../public/
         env:
           HUGO_ENV: production
 
