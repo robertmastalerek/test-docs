@@ -12,7 +12,7 @@ menu:
 
 ---
 
-In this section, you'll learn how to add decision automation to your process by using [BPMN 2.0 *Business Rule Tasks*](/manual/latest/reference/bpmn20/tasks/business-rule-task/) and [DMN 1.3 Decision Tables](/manual/latest/reference/dmn11/).
+In this section, you'll learn how to add decision automation to your process by using [BPMN 2.0 *Business Rule Tasks*](/user-guide/latest/reference/bpmn20/tasks/business-rule-task/) and [DMN 1.3 Decision Tables](/user-guide/latest/reference/dmn11/).
 
 # Add a Business Rule Task to the Process
 Use the Camunda Modeler to open the Payment Retrieval process then click on the Approve Payment Task. Change the activity type to *Business Rule Task* in the wrench button menu.
@@ -36,7 +36,7 @@ Next, create a new DMN table by clicking the table button.
 {{< img src="../img/modeler-new-dmn-table.png" >}}
 
 # Specify the DMN table
-First, specify the input expressions for the DMN table. In this example, we'll decide whether a payment is approved based on the item name. Your rules can also make use of the FEEL Expression Language, JUEL or Script. If you like, you can [read more about Expressions in the DMN Engine](/manual/latest/user-guide/dmn-engine/expressions-and-scripts/).
+First, specify the input expressions for the DMN table. In this example, we'll decide whether a payment is approved based on the item name. Your rules can also make use of the FEEL Expression Language, JUEL or Script. If you like, you can [read more about Expressions in the DMN Engine](/user-guide/latest/user-guide/dmn-engine/expressions-and-scripts/).
 
 Double click *Input* to configure the input column. Use `Item` as the *Input Label* and `item` as the *Input Expression*:
 {{< img src="../img/modeler-dmn2.png" >}}

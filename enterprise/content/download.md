@@ -3939,13 +3939,13 @@ On this page we provide downloads for the Camunda Platform Enterprise Platform i
 
 This page contains the latest versions of all supported branches. In addition, we provide alpha releases of the current development branch. Please note that an alpha release is not fully tested and just a snapshot of the current development state.
 
-Find more information about the [Full Distribution](/manual/latest/introduction/downloading-camunda/#full-distribution) and the [Standalone Web Application](/manual/latest/introduction/downloading-camunda/#standalone-web-application-distribution) (Discontinued starting from Camunda Platform 7.20) in our user guide.
+Find more information about the [Full Distribution](/user-guide/latest/introduction/downloading-camunda/#full-distribution) and the [Standalone Web Application](/user-guide/latest/introduction/downloading-camunda/#standalone-web-application-distribution) (Discontinued starting from Camunda Platform 7.20) in our user guide.
 
 {{< ee-download >}}
 
 ### Camunda RPA Bridge
 
-The [Camunda RPA bridge](/manual/7.19/user-guide/camunda-bpm-rpa-bridge/) is a standalone application that allows to call RPA (robotic process automation) bots from BPMN models deployed to the Camunda Platform. Read the [installation guide](/manual/7.19/installation/camunda-bpm-rpa-bridge) for further instructions. Consult the [Getting Started Guide](/get-started/rpa) for a hands-on introduction to setting up RPA orchestration.
+The [Camunda RPA bridge](/user-guide/7.19/user-guide/camunda-bpm-rpa-bridge/) is a standalone application that allows to call RPA (robotic process automation) bots from BPMN models deployed to the Camunda Platform. Read the [installation guide](/user-guide/7.19/installation/camunda-bpm-rpa-bridge) for further instructions. Consult the [Getting Started Guide](/get-started/rpa) for a hands-on introduction to setting up RPA orchestration.
 
 {{< note title="Camunda discontinues the maintenance of the Camunda RPA bridge." class="warning" >}}
 Camunda Automation Platform 7.19 is the last release maintaining compatibility with the Camunda RPA bridge. Camunda Automation Platform 7.19 and Camunda RPA bridge will be maintained for another 18 months until Oct 2024.
@@ -4096,10 +4096,10 @@ The Camunda RPA Bridge is replaced by RPA [Out-of-the-box Connectors](https://do
 ### Additional Information
 
 - [Maven Coordinates](/get-started/apache-maven)
-- [Update and Migration Guide](/manual/latest/update)
+- [Update and Migration Guide](/user-guide/latest/update)
 - [Getting Started](/get-started)
-- [Examples](/manual/latest/examples)
-- [Supported Environments](/manual/latest/introduction/supported-environments)
+- [Examples](/user-guide/latest/examples)
+- [Supported Environments](/user-guide/latest/introduction/supported-environments)
 - [Previous Versions](https://downloads.camunda.cloud/enterprise-release/)
 
 ## Camunda Optimize
