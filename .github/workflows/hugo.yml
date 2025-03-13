@@ -25,32 +25,44 @@ jobs:
       HUGO_VERSION: '0.54.0'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Install Hugo CLI
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Deploy enterprise to GitHub Pages
-        uses: actions/deploy-pages@v1
-        with:
-          path: enterprise/public
+      - name: Build and Deploy get-started site
+        run: |
+          cd get-started
+          hugo -s . -d ../public/get-started
+        env:
+          HUGO_ENV: production
 
-      - name: Build security site
+      - name: Build and Deploy enterprise site
+        run: |
+          cd enterprise
+          hugo -s . -d ../public/enterprise
+        env:
+          HUGO_ENV: production
+
+      - name: Build and Deploy security site
         run: |
           cd security
-          hugo server --baseURL=http://localhost
-      - name: Deploy security to GitHub Pages
-        uses: actions/deploy-pages@v1
-        with:
-          path: security/public
+          hugo -s . -d ../public/security
+        env:
+          HUGO_ENV: production
 
-      - name: Build user-guide site
+      - name: Build and Deploy user-guide site
         run: |
           cd user-guide
-          hugo server --baseURL=http://localhost
-      - name: Deploy user-guide to GitHub Pages
-        uses: actions/deploy-pages@v1
+          hugo -s . -d ../public/user-guide
+        env:
+          HUGO_ENV: production
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: user-guide/public
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          destination_dir: docs
