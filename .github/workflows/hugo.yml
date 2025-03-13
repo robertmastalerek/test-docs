@@ -19,50 +19,58 @@ defaults:
     shell: bash
 
 jobs:
-  build_and_deploy:
+  deploy_get_started:
     runs-on: ubuntu-latest
-    env:
-      HUGO_VERSION: '0.54.0'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install Hugo CLI
-        run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
-
-      - name: Build and Deploy get-started site
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build get-started site
         run: |
           cd get-started
-          hugo -s . -d ../public/get-started
-        env:
-          HUGO_ENV: production
+          hugo server --baseURL=http://localhost
+      - name: Deploy get-started to GitHub Pages
+        uses: actions/deploy-pages@v1
+        with:
+          path: get-started/public
 
-      - name: Build and Deploy enterprise site
+  deploy_enterprise:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build enterprise site
         run: |
           cd enterprise
-          hugo -s . -d ../public/enterprise
-        env:
-          HUGO_ENV: production
+          hugo server --baseURL=http://localhost
+      - name: Deploy enterprise to GitHub Pages
+        uses: actions/deploy-pages@v1
+        with:
+          path: enterprise/public
 
-      - name: Build and Deploy security site
+  deploy_security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build security site
         run: |
           cd security
-          hugo -s . -d ../public/security
-        env:
-          HUGO_ENV: production
+          hugo server --baseURL=http://localhost
+      - name: Deploy security to GitHub Pages
+        uses: actions/deploy-pages@v1
+        with:
+          path: security/public
 
-      - name: Build and Deploy user-guide site
+  deploy_user_guide:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build user-guide site
         run: |
           cd user-guide
-          hugo -s . -d ../public/user-guide
-        env:
-          HUGO_ENV: production
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+          hugo server --baseURL=http://localhost
+      - name: Deploy user-guide to GitHub Pages
+        uses: actions/deploy-pages@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          destination_dir: docs
+          path: user-guide/public
