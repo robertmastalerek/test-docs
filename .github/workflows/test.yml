@@ -46,8 +46,9 @@ jobs:
               git checkout --orphan $section  # Tworzymy czysty branch bez historii
               git rm -rf .  # Usuwamy wszystko z brancha
           
-              # Przenosimy zawartość katalogu `public-$section` do root-a
-              mv public-$section/* .
+              # Przenosimy tylko zawartość katalogu public-$section do root-a
+              # Znajdujemy wszystkie pliki i foldery, kopiujemy je do root-a
+              find public-$section -mindepth 1 -maxdepth 1 -exec mv {} ./ \;
           
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
@@ -77,11 +78,11 @@ jobs:
           for section in $SECTIONS; do
             echo "Publishing $section to GitHub Pages..."
           
-            # Usuwamy wszystkie istniejące pliki w gh-pages/docs/$section
+            # Usuwamy wszystkie pliki w gh-pages/docs/$section
             rm -rf docs/$section/*
           
-            # Kopiujemy zawartość public-$section do docs/$section
-            cp -r ../public-$section/* docs/$section/
+            # Kopiujemy tylko zawartość public-$section do docs/$section (bez struktury folderów)
+            find ../public-$section -mindepth 1 -maxdepth 1 -exec cp -r {} docs/$section/ \;
           done
           
           # Dodajemy .nojekyll, aby GitHub Pages nie próbował przetwarzać plików jako Jekyll
