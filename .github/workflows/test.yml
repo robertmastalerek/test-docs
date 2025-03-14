@@ -56,13 +56,15 @@ jobs:
               git branch $section  # Tworzymy czysty branch bez historii
           
               # Usuwamy wszystkie pliki w obecnym branchu, które nie należą do public-$section
-              find ../$section -mindepth 1 -maxdepth 1 -exec cp -r {} docs/$section/ \;
+              find $section -mindepth 1 -maxdepth 1 -not -name '.*' -exec cp -r {} docs/$section/ \;
           
               cd $section
           
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
               git push origin $section --force
+              cd ..
+              git checkout master
             else
               echo "Skipping $section – directory $section not found."
             fi
