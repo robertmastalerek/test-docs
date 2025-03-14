@@ -51,7 +51,8 @@ jobs:
 
       - name: Copy built files to gh-pages/docs/{branch}
         run: |
-          for section in enterprise user-docs get-started security; do
+          cd gh-pages  # 🔥 PRZENOSIMY SIĘ DO KATALOGU GH-PAGES 🔥
+          for section in enterprise user-guide get-started security; do
             echo "Publishing $section to GitHub Pages..."
             mkdir -p gh-pages/docs/$section
             rm -rf gh-pages/docs/$section/*

@@ -1,5 +1,7 @@
 name: Deploy Multi-Site Hugo to GitHub Pages
 
+enabled: false
+
 on:
   push:
     branches: ["master"]
