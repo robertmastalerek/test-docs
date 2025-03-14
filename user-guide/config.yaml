@@ -1,5 +1,5 @@
 ---
-baseURL: "/test-docs"
+baseURL: "/test-docs/user-guide"
 languageCode: "en-us"
 title: "Camunda 7 documentation"
 theme: "camunda"
@@ -10,14 +10,14 @@ blackfriday:
   plainIDAnchors: true
 
 params:
-  canonicalBasePath: "https://robertmastalerek.github.io/test-docs"
+  canonicalBasePath: "https://robertmastalerek.github.io/test-docs/user-guide"
   sections:
     - id: "get-started"
       name: "Get Started"
       url: "/test-docs/get-started"
     - id: "user-guide"
       name: "Camunda 7"
-      url: "/"
+      url: "/test-docs/user-guide"
     - id: "enterprise"
       name: "Enterprise"
       url: "/test-docs/enterprise"

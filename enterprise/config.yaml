@@ -17,7 +17,7 @@ params:
       url: "/test-docs/get-started"
     - id: "user-guide"
       name: "Camunda 7"
-      url: "/"
+      url: "/test-docs/user-guide"
     - id: "enterprise"
       name: "Enterprise"
       url: "/test-docs/enterprise"

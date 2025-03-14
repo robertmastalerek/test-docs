@@ -10,14 +10,14 @@ blackfriday:
   plainIDAnchors: true
 
 params:
-  canonicalBasePath: "https://docs.camunda.org"
+  canonicalBasePath: "/test-docs/security"
   sections:
     - id: "get-started"
       name: "Get Started"
       url: "/test-docs/get-started"
     - id: "user-guide"
       name: "Camunda 7"
-      url: "/"
+      url: "/test-docs/user-guide"
     - id: "enterprise"
       name: "Enterprise"
       url: "/test-docs/enterprise"
