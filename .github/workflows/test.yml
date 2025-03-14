@@ -42,15 +42,16 @@ jobs:
             echo "Pushing changes for $section..."
           
             # Sprawdź, czy katalog istnieje
-            if [ -d "public-$section" ]; then
-              # Checkout do istniejącego brancha, jeśli już istnieje
-              git checkout $section || git checkout --orphan $section  # Jeśli brancha nie ma, to tworzymy go bez historii
-
-              # Usuwamy wszystkie pliki z brancha, które nie są związane z public-$section
-              git rm -rf .  # Usuwamy wszystkie pliki w obecnym branchu
+            if [ -d "$section" ]; then
+              # Jeśli branch już istnieje, to robimy checkout
+              if git show-ref --verify --quiet refs/heads/$section; then
+                git checkout $section  # Checkout do istniejącego brancha
+              else
+                git checkout --orphan $section  # Tworzymy nowy branch bez historii
+              fi
           
-              # Przenosimy tylko zawartość katalogu public-$section do root-a
-              find public-$section -mindepth 1 -maxdepth 1 -exec mv {} ./ \;
+              # Przenosimy tylko zawartość katalogu $section do root-a
+              find . -maxdepth 1 ! -name '$section' ! -name '.git' -exec rm -rf {} \;
           
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
