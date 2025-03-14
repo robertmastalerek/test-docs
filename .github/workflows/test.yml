@@ -15,11 +15,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Hugo
+      - name: Cache Hugo
+        id: cache-hugo
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/hugo
+          key: hugo-${{ runner.os }}-0.54.0
+
+      - name: Install Hugo if not cached
+        if: steps.cache-hugo.outputs.cache-hit != 'true'
         run: |
           HUGO_VERSION=0.54.0
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb
+          sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
       - name: Define sections
         run: echo "SECTIONS=enterprise user-guide get-started security" >> $GITHUB_ENV
@@ -31,15 +39,24 @@ jobs:
             hugo --source $section --minify -d "public-$section"
           done
 
-      - name: Push changes to section branches
+      - name: Push changes to branches
         run: |
           for section in $SECTIONS; do
             echo "Pushing changes for $section..."
-            git checkout -B $section
-            git add public-$section
-            git commit -m "Update $section documentation" || echo "No changes to commit"
-            git push origin $section --force
+          
+            # Sprawdź, czy katalog istnieje
+            if [ -d "public-$section" ]; then
+              git checkout -B $section
+              git add public-$section
+              git commit -m "Update $section documentation" || echo "No changes to commit"
+              git push origin $section --force
+            else
+              echo "Skipping $section – directory public-$section not found."
+            fi
           done
+        shell: bash
+        env:
+          SECTIONS: "enterprise user-guide get-started security"
 
   publish:
     needs: deploy
