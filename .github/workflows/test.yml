@@ -32,8 +32,10 @@ jobs:
       - name: Build documentation
         run: |
           for section in $SECTIONS; do
+            cd $section
             echo "Building Hugo site for $section..."
             hugo --source $section --minify -d "public-$section"
+            cd ..
           done
 
       - name: Push changes to branches
