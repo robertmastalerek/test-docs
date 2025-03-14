@@ -62,6 +62,7 @@ jobs:
                 exit 1
               fi
           
+              mkdir docs
               mkdir docs/$section
 
               # Usuwamy wszystkie pliki w katalogu docs/$section
@@ -99,7 +100,8 @@ jobs:
           for section in enterprise get-started user-guide security; do
             echo "Publishing $section to GitHub Pages..."
           
-              mkdir docs/$section
+            mkdir docs
+            mkdir docs/$section
           
             # Usuwamy wszystkie pliki w gh-pages/docs/$section
             rm -rf docs/$section/*
