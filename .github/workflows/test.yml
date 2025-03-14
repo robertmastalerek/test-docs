@@ -39,7 +39,7 @@ jobs:
 
           # Kopiowanie nowej wersji dokumentacji
           rm -rf $DEST_DIR
-          mv ../public $DEST_DIR
+          mv ../public-${BRANCH_NAME} $DEST_DIR
 
           # Commit zmian
           git config user.name "github-actions"
