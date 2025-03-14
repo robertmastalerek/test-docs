@@ -61,6 +61,8 @@ jobs:
                 echo "Error: public-$section directory not found in $section. Exiting..."
                 exit 1
               fi
+          
+              mkdir docs/$section
 
               # Usuwamy wszystkie pliki w katalogu docs/$section
               rm -rf docs/$section/*
@@ -96,6 +98,8 @@ jobs:
           cd gh-pages
           for section in enterprise get-started user-guide security; do
             echo "Publishing $section to GitHub Pages..."
+          
+              mkdir docs/$section
           
             # Usuwamy wszystkie pliki w gh-pages/docs/$section
             rm -rf docs/$section/*
