@@ -29,16 +29,21 @@ jobs:
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb
           sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Build documentation in each section
+      - name: Build documentation
         run: |
           for section in enterprise get-started user-guide security; do
             echo "Building Hugo site for $section..."
-            cd $section
-            hugo --minify -d "public-$section"  # Budujemy stronę Hugo w odpowiednim katalogu
-            cd ..
+          
+            if [ -d "$section" ]; then
+              cd $section
+              hugo --minify -d "public-$section"  # Budujemy stronę Hugo w katalogu $section/public-$section
+              cd ..
+            else
+              echo "Skipping $section – directory $section not found."
+            fi
           done
 
-      - name: Push changes to respective branches
+      - name: Push changes to branches
         run: |
           for section in enterprise get-started user-guide security; do
             echo "Pushing changes for $section..."
@@ -48,12 +53,21 @@ jobs:
               if git show-ref --verify --quiet refs/heads/$section; then
                 git checkout $section || exit 1  # Przechodzimy na istniejący branch
               else
-                git checkout -b $section || exit 1  # Jeśli branż nie istnieje, tworzymy nowy
+                git checkout -b $section || exit 1  # Jeśli branch nie istnieje, tworzymy nowy
               fi
           
-              # Usuwamy wszystkie pliki, które nie należą do public-$section
-              find public-$section -mindepth 1 -exec cp -r {} docs/$section/ \; || exit 1
-          
+              # Sprawdzamy, czy katalog został wygenerowany wewnątrz katalogu $section
+              if [ ! -d "$section/public-$section" ]; then
+                echo "Error: public-$section directory not found in $section. Exiting..."
+                exit 1
+              fi
+
+              # Usuwamy wszystkie pliki w katalogu docs/$section
+              rm -rf docs/$section/*
+
+              # Kopiujemy pliki z katalogu public-$section do docs/$section
+              cp -r $section/public-$section/* docs/$section/ || exit 1
+
               # Wykonujemy commit i wypychamy zmiany na odpowiedni branch
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
@@ -63,6 +77,8 @@ jobs:
             fi
           done
         shell: bash
+        env:
+          SECTIONS: "enterprise get-started user-guide security"
 
   publish:
     needs: deploy
@@ -75,31 +91,27 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
-      - name: Publish each section to gh-pages
+      - name: Copy built files to gh-pages/docs/{branch}
         run: |
           cd gh-pages
           for section in enterprise get-started user-guide security; do
             echo "Publishing $section to GitHub Pages..."
           
-            # Usuwamy istniejące pliki w docs/$section
-            rm -rf docs/$section/* || exit 1
+            # Usuwamy wszystkie pliki w gh-pages/docs/$section
+            rm -rf docs/$section/*
           
-            # Kopiujemy zawartość z public-$section do docs/$section
-            if [ -d "../public-$section" ]; then
-              find ../public-$section -mindepth 1 -exec cp -r {} docs/$section/ \; || exit 1
-            else
-              echo "No files to copy for $section"
-            fi
+            # Kopiujemy tylko zawartość public-$section do docs/$section (bez struktury folderów)
+            cp -r ../$section/public-$section/* docs/$section/ || exit 1
           done
+          
+          # Dodajemy .nojekyll, aby GitHub Pages nie próbował przetwarzać plików jako Jekyll
+          touch .nojekyll
 
-          # Dodajemy .nojekyll, aby GitHub Pages nie przetwarzał plików jako Jekyll
-          touch .nojekyll || exit 1
-
-      - name: Commit and push changes to gh-pages
+      - name: Commit and push changes
         run: |
           cd gh-pages
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
           git add .
           git commit -m "Deploy documentation to GitHub Pages" || echo "No changes to commit"
-          git push origin gh-pages || exit 1
+          git push origin gh-pages
