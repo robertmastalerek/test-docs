@@ -21,19 +21,22 @@ jobs:
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Build and push documentation for each section
+      - name: Define sections
+        run: echo "SECTIONS=(enterprise user-guide get-started security)" >> $GITHUB_ENV
+
+      - name: Build documentation
         run: |
-          for section in enterprise user-guide get-started security; do
-            echo "Processing $section..."
-
-            # Checkout or create branch
-            git checkout -B $section
-
-            # Build documentation
+          for section in "${SECTIONS[@]}"; do
+            echo "Building Hugo site for $section..."
             hugo --source $section --minify -d "public-$section"
+          done
 
-            # Commit and push to branch
-            git add .
+      - name: Push changes to section branches
+        run: |
+          for section in "${SECTIONS[@]}"; do
+            echo "Pushing changes for $section..."
+            git checkout -B $section
+            git add public-$section
             git commit -m "Update $section documentation" || echo "No changes to commit"
             git push origin $section --force
           done
@@ -52,7 +55,7 @@ jobs:
       - name: Copy built files to gh-pages/docs/{branch}
         run: |
           cd gh-pages  # 🔥 PRZENOSIMY SIĘ DO KATALOGU GH-PAGES 🔥
-          for section in enterprise user-guide get-started security; do
+          for section in "${SECTIONS[@]}"; do
             echo "Publishing $section to GitHub Pages..."
             mkdir -p gh-pages/docs/$section
             rm -rf gh-pages/docs/$section/*
