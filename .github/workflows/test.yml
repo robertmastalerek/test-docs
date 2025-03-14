@@ -32,22 +32,22 @@ jobs:
       - name: Build documentation
         run: |
           for section in $SECTIONS; do
-            cd $section
             echo "Building Hugo site for $section..."
-            hugo --minify -d "public-$section"
-            cd ..
+            hugo --source $section --minify -d "public-$section"
           done
 
       - name: Push changes to branches
         run: |
           for section in $SECTIONS; do
             echo "Pushing changes for $section..."
-      
-            if [ -d "$section" ]; then
-              git checkout --orphan $section
-              git rm -rf .
           
-              mv $section/* .
+            # Sprawdź, czy katalog istnieje
+            if [ -d "public-$section" ]; then
+              git checkout --orphan $section  # Tworzymy czysty branch bez historii
+              git rm -rf .  # Usuwamy wszystko z brancha
+          
+              # Przenosimy zawartość katalogu `public-$section` do root-a
+              mv public-$section/* .
           
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
@@ -73,13 +73,15 @@ jobs:
 
       - name: Copy built files to gh-pages/docs/{branch}
         run: |
-          cd gh-pages  # 🔥 PRZENOSIMY SIĘ DO KATALOGU GH-PAGES 🔥
+          cd gh-pages
           for section in $SECTIONS; do
             echo "Publishing $section to GitHub Pages..."
-            mkdir -p gh-pages/docs/$section
-            rm -rf gh-pages/docs/$section/*
-            git checkout $section -- public-$section
-            mv public-$section/* gh-pages/docs/$section/
+          
+            # Usuwamy wszystkie istniejące pliki w gh-pages/docs/$section
+            rm -rf docs/$section/*
+          
+            # Kopiujemy zawartość public-$section do docs/$section
+            cp -r ../public-$section/* docs/$section/
           done
           
           # Dodajemy .nojekyll, aby GitHub Pages nie próbował przetwarzać plików jako Jekyll
