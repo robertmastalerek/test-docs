@@ -34,7 +34,7 @@ jobs:
           for section in $SECTIONS; do
             cd $section
             echo "Building Hugo site for $section..."
-            hugo --minify -d "../public-$section"
+            hugo --minify -d "public-$section"
             cd ..
           done
 
@@ -43,13 +43,11 @@ jobs:
           for section in $SECTIONS; do
             echo "Pushing changes for $section..."
       
-            # Sprawdź, czy katalog istnieje
-            if [ -d "public-$section" ]; then
-              git checkout --orphan $section  # Tworzymy czysty branch bez historii
-              git rm -rf .  # Usuwamy wszystko z brancha
+            if [ -d "$section" ]; then
+              git checkout --orphan $section
+              git rm -rf .
           
-              # Przenosimy zawartość katalogu `public-$section` do root-a
-              mv public-$section/* .
+              mv $section/* .
           
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
