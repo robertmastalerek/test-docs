@@ -85,7 +85,6 @@ jobs:
           git add .
           git commit -m "Deploy documentation to GitHub Pages" || echo "No changes to commit"
           git push origin gh-pages
-        SECTIONS: "enterprise user-guide get-started security"
 
 #      - name: Determine branch name
 #        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
