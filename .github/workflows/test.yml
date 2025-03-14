@@ -45,21 +45,26 @@ jobs:
           
             # Sprawdź, czy katalog istnieje
             if [ -d "$section" ]; then
-              # Jeśli branch już istnieje, to robimy checkout
+              # Jeśli branch już istnieje, to usuwamy go lokalnie i na zdalnym repozytorium
               if git show-ref --verify --quiet refs/heads/$section; then
-                git checkout $section  # Checkout do istniejącego brancha
-              else
-                git checkout --orphan $section  # Tworzymy nowy branch bez historii
+                git checkout master  # Zmieniamy branch na master
+                git branch -D $section  # Usuwamy branch lokalnie
+                git push origin --delete $section  # Usuwamy branch z repozytorium
               fi
           
-              # Przenosimy tylko zawartość katalogu $section do root-a
+              # Tworzymy nowy branch bez historii
+              git branch $section  # Tworzymy czysty branch bez historii
+          
+              # Usuwamy wszystkie pliki w obecnym branchu, które nie należą do public-$section
               find . -maxdepth 1 ! -name '$section' ! -name '.git' -exec rm -rf {} \;
+          
+              cd $section
           
               git add .
               git commit -m "Update $section documentation" || echo "No changes to commit"
               git push origin $section --force
             else
-              echo "Skipping $section – directory public-$section not found."
+              echo "Skipping $section – directory $section not found."
             fi
           done
         shell: bash
