@@ -29,9 +29,6 @@ jobs:
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb
           sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Define sections
-        run: echo "SECTIONS=enterprise user-guide get-started security" >> $GITHUB_ENV
-
       - name: Build documentation
         run: |
           for section in $SECTIONS; do
@@ -88,6 +85,7 @@ jobs:
           git add .
           git commit -m "Deploy documentation to GitHub Pages" || echo "No changes to commit"
           git push origin gh-pages
+        SECTIONS: "enterprise user-guide get-started security"
 
 #      - name: Determine branch name
 #        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
