@@ -9,4 +9,4 @@ menu:
 
 ---
 
-aThis document targets Developers who want to use Camunda Process Engine in their applications.
+This document targets Developers who want to use Camunda Process Engine in their applications.

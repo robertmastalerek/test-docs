@@ -81,6 +81,9 @@ jobs:
             git checkout $section -- public-$section
             mv public-$section/* gh-pages/docs/$section/
           done
+          
+          # Dodajemy .nojekyll, aby GitHub Pages nie próbował przetwarzać plików jako Jekyll
+          touch .nojekyll
 
       - name: Commit and push changes
         run: |
