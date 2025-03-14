@@ -34,7 +34,7 @@ jobs:
           for section in $SECTIONS; do
             cd $section
             echo "Building Hugo site for $section..."
-            hugo --minify -d "public-$section"
+            hugo --minify -d "../public-$section"
             cd ..
           done
 
