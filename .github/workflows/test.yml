@@ -22,18 +22,18 @@ jobs:
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
       - name: Define sections
-        run: echo "SECTIONS=(enterprise user-guide get-started security)" >> $GITHUB_ENV
+        run: echo "SECTIONS='enterprise manual get-started security'" >> $GITHUB_ENV
 
       - name: Build documentation
         run: |
-          for section in "${SECTIONS[@]}"; do
+          for section in $SECTIONS; do
             echo "Building Hugo site for $section..."
             hugo --source $section --minify -d "public-$section"
           done
 
       - name: Push changes to section branches
         run: |
-          for section in "${SECTIONS[@]}"; do
+          for section in $SECTIONS; do
             echo "Pushing changes for $section..."
             git checkout -B $section
             git add public-$section
@@ -55,7 +55,7 @@ jobs:
       - name: Copy built files to gh-pages/docs/{branch}
         run: |
           cd gh-pages  # 🔥 PRZENOSIMY SIĘ DO KATALOGU GH-PAGES 🔥
-          for section in "${SECTIONS[@]}"; do
+          for section in $SECTIONS; do
             echo "Publishing $section to GitHub Pages..."
             mkdir -p gh-pages/docs/$section
             rm -rf gh-pages/docs/$section/*
