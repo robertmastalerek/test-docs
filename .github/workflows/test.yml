@@ -3,10 +3,7 @@ name: Deploy Hugo Docs to GitHub Pages
 on:
   push:
     branches:
-      - user-guide
-      - get-started
-      - enterprise
-      - security
+      - master
 
 jobs:
   deploy:
@@ -24,23 +21,43 @@ jobs:
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Determine branch name
-        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      - name: Build and push documentation for each section
+        run: |
+          for section in enterprise user-guide get-started security; do
+            echo "Processing $section..."
 
-      - name: Build Hugo site
-        run: hugo --minify -d "public-${{ env.BRANCH_NAME }}"
+            # Checkout or create branch
+            git checkout -B $section
 
-      - name: Checkout `gh-pages` branch
+            # Build documentation
+            hugo --source $section --minify -d "public-$section"
+
+            # Commit and push to branch
+            git add .
+            git commit -m "Update $section documentation" || echo "No changes to commit"
+            git push origin $section --force
+          done
+
+  publish:
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
 
-      - name: Move built files to `gh-pages/docs/{branch}`
+      - name: Copy built files to gh-pages/docs/{branch}
         run: |
-          mkdir -p gh-pages/docs/${{ env.BRANCH_NAME }}
-          rm -rf gh-pages/docs/${{ env.BRANCH_NAME }}/*
-          mv public-${{ env.BRANCH_NAME }}/* gh-pages/docs/${{ env.BRANCH_NAME }}/
+          for section in enterprise user-docs get-started security; do
+            echo "Publishing $section to GitHub Pages..."
+            mkdir -p gh-pages/docs/$section
+            rm -rf gh-pages/docs/$section/*
+            git checkout $section -- public-$section
+            mv public-$section/* gh-pages/docs/$section/
+          done
 
       - name: Commit and push changes
         run: |
@@ -48,5 +65,32 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
           git add .
-          git commit -m "Deploy ${{ env.BRANCH_NAME }} to GitHub Pages" || echo "No changes to commit"
+          git commit -m "Deploy documentation to GitHub Pages" || echo "No changes to commit"
           git push origin gh-pages
+
+#      - name: Determine branch name
+#        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+#
+#      - name: Build Hugo site
+#        run: hugo --minify -d "public-${{ env.BRANCH_NAME }}"
+#
+#      - name: Checkout `gh-pages` branch
+#        uses: actions/checkout@v4
+#        with:
+#          ref: gh-pages
+#          path: gh-pages
+#
+#      - name: Move built files to `gh-pages/docs/{branch}`
+#        run: |
+#          mkdir -p gh-pages/docs/${{ env.BRANCH_NAME }}
+#          rm -rf gh-pages/docs/${{ env.BRANCH_NAME }}/*
+#          mv public-${{ env.BRANCH_NAME }}/* gh-pages/docs/${{ env.BRANCH_NAME }}/
+#
+#      - name: Commit and push changes
+#        run: |
+#          cd gh-pages
+#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#          git config --global user.name "GitHub Actions"
+#          git add .
+#          git commit -m "Deploy ${{ env.BRANCH_NAME }} to GitHub Pages" || echo "No changes to commit"
+#          git push origin gh-pages
