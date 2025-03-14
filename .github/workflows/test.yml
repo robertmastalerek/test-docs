@@ -24,27 +24,29 @@ jobs:
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
+      - name: Determine branch name
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
       - name: Build Hugo site
-        run: |
-          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
-          hugo --destination ../public-${BRANCH_NAME}
+        run: hugo --minify -d "public-${{ env.BRANCH_NAME }}"
 
-      - name: Deploy to GitHub Pages
+      - name: Checkout `gh-pages` branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Move built files to `gh-pages/docs/{branch}`
         run: |
-          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
-          DEST_DIR="docs-${BRANCH_NAME}"
-          
-          git clone --depth 1 --branch gh-pages https://github.com/${{ github.repository }} gh-pages
+          mkdir -p gh-pages/docs/${{ env.BRANCH_NAME }}
+          rm -rf gh-pages/docs/${{ env.BRANCH_NAME }}/*
+          mv public-${{ env.BRANCH_NAME }}/* gh-pages/docs/${{ env.BRANCH_NAME }}/
+
+      - name: Commit and push changes
+        run: |
           cd gh-pages
-
-          # Kopiowanie nowej wersji dokumentacji
-          rm -rf $DEST_DIR
-          mv ../public-${BRANCH_NAME} $DEST_DIR
-
-          # Commit zmian
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
           git add .
-          git commit -m "Deploy Hugo docs for $BRANCH_NAME" || echo "No changes to commit"
-          git push
-
+          git commit -m "Deploy ${{ env.BRANCH_NAME }} to GitHub Pages" || echo "No changes to commit"
+          git push origin gh-pages
