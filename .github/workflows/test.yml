@@ -27,7 +27,6 @@ jobs:
       - name: Build Hugo site
         run: |
           BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
-          cd hugo-site
           hugo --destination ../public-${BRANCH_NAME}
 
       - name: Deploy to GitHub Pages
