@@ -3,7 +3,10 @@ name: Deploy Hugo Docs to GitHub Pages
 on:
   push:
     branches:
-      - master
+      - user-guide
+      - get-started
+      - enterprise
+      - security
 
 jobs:
   deploy:
@@ -15,103 +18,33 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Hugo
-        id: cache-hugo
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/bin/hugo
-          key: hugo-${{ runner.os }}-0.54.0
-
-      - name: Install Hugo if not cached
-        if: steps.cache-hugo.outputs.cache-hit != 'true'
+      - name: Install Hugo
         run: |
           HUGO_VERSION=0.54.0
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb
-          sudo dpkg -i ${{ runner.temp }}/hugo.deb
+          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      - name: Build documentation
-        run: |
-          for section in enterprise get-started user-guide security; do
-            echo "Building Hugo site for $section..."
-          
-            if [ -d "$section" ]; then
-              cd $section
-              hugo --minify -d "public-$section"  # Budujemy stronę Hugo w katalogu $section/public-$section
-              cd ..
-            else
-              echo "Skipping $section – directory $section not found."
-            fi
-          done
+      - name: Determine branch name
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
-      - name: Push changes to branches
-        run: |
-          for section in enterprise get-started user-guide security; do
-            echo "Pushing changes for $section..."
-          
-            if [ -d "$section" ]; then
-              # Sprawdzamy, czy branch istnieje, jeśli tak, to przechodzimy na niego
-              if git show-ref --verify --quiet refs/heads/$section; then
-                git checkout $section || exit 1  # Przechodzimy na istniejący branch
-              else
-                git checkout -b $section || exit 1  # Jeśli branch nie istnieje, tworzymy nowy
-              fi
-          
-              # Sprawdzamy, czy katalog został wygenerowany wewnątrz katalogu $section
-              if [ ! -d "$section/public-$section" ]; then
-                echo "Error: public-$section directory not found in $section. Exiting..."
-                exit 1
-              fi
-          
-              mkdir -p docs
-              mkdir -p docs/$section
+      - name: Build Hugo site
+        run: hugo --minify -d "public-${{ env.BRANCH_NAME }}"
 
-              # Usuwamy wszystkie pliki w katalogu docs/$section
-              rm -rf docs/$section/*
-
-              # Kopiujemy pliki z katalogu public-$section do docs/$section
-              cp -r $section/public-$section/* docs/$section/ || exit 1
-
-              # Wykonujemy commit i wypychamy zmiany na odpowiedni branch
-              git add .
-              git commit -m "Update $section documentation" || echo "No changes to commit"
-              git push origin $section --force || exit 1
-            else
-              echo "Skipping $section – directory $section not found."
-            fi
-          done
-        shell: bash
-        env:
-          SECTIONS: "enterprise get-started user-guide security"
-
-  publish:
-    needs: deploy
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout gh-pages branch
+      - name: Checkout `gh-pages` branch
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
 
-      - name: Copy built files to gh-pages/docs/{branch}
+      - name: Move built files to `gh-pages/docs/{branch}`
         run: |
-          cd gh-pages
-          for section in enterprise get-started user-guide security; do
-            echo "Publishing $section to GitHub Pages..."
-          
-            mkdir -p docs
-            mkdir -p docs/$section
-          
-            # Usuwamy wszystkie pliki w gh-pages/docs/$section
-            rm -rf docs/$section/*
-          
-            # Kopiujemy tylko zawartość public-$section do docs/$section (bez struktury folderów)
-            cp -r ../$section/public-$section/* docs/$section/ || exit 1
-          done
-          
-          # Dodajemy .nojekyll, aby GitHub Pages nie próbował przetwarzać plików jako Jekyll
-          touch .nojekyll
+          if [[ "${{ env.BRANCH_NAME }}" == "manual" ]]; then
+#            rm -rf gh-pages/docs/*
+            mv public-manual/* gh-pages/docs/
+          fi
+          mkdir -p gh-pages/docs/${{ env.BRANCH_NAME }}
+          rm -rf gh-pages/docs/${{ env.BRANCH_NAME }}/*
+          mv public-${{ env.BRANCH_NAME }}/* gh-pages/docs/${{ env.BRANCH_NAME }}/
 
       - name: Commit and push changes
         run: |
@@ -119,5 +52,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
           git add .
-          git commit -m "Deploy documentation to GitHub Pages" || echo "No changes to commit"
+          git commit -m "Deploy ${{ env.BRANCH_NAME }} to GitHub Pages" || echo "No changes to commit"
           git push origin gh-pages
